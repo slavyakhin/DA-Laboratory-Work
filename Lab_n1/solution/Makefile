@@ -3,13 +3,13 @@ CXXFLAGS := -std=c++17 -Wall -Wextra -I.
 
 # Executable name - solution
 
-solution: main.o
-	$(CXX) $(CXXFLAGS) -o $@ main.o
+all: main.o
+	$(CXX) $(CXXFLAGS) -g -o solution main.o
 
-main: main.cpp pair.hpp date.hpp vector.hpp sort.hpp
-	$(CXX) $(CXXFLAGS) -c main.cpp
+main.o: main.cpp pair.hpp date.hpp vector.hpp sort.hpp
+	$(CXX) $(CXXFLAGS) -g -c main.cpp
 
 clean:
-	rm -f *.o
+	rm main.o
 
-.PHONY: all clean
+.PHONY: all main.o clean

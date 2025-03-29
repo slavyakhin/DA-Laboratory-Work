@@ -122,9 +122,7 @@ bool TVector<T>::Empty() {
 
 template<typename T>
 T& TVector<T>::operator [](const int index) {
-    if (index < this->size) {
-        return this->dataPtr[index];
-    }
+    return this->dataPtr[index];
 }
 
 template<typename T>
