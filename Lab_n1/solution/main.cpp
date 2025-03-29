@@ -7,8 +7,13 @@
 #include "vector.hpp"
 #include "sort.hpp"
 
+
 int main()
 {
+    std::ios_base::sync_with_stdio(false);
+    std::cout.tie(0);
+    std::cin.tie(0);
+
     unsigned long long value;
 
     std::string strBuf;
@@ -31,7 +36,7 @@ int main()
     RadixSort(vector);
 
     for (int i = 0; i < vector.Size(); ++i) {
-        fout << vector[i].key.GetDateStr() << '\t' << vector[i].value << std::endl;
+        fout << vector[i].key.GetDateStr() << '\t' << vector[i].value << '\n';
     }
     
     fin.close();
@@ -39,3 +44,4 @@ int main()
     
     return 0;
 }
+

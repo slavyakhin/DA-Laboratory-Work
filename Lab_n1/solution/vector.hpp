@@ -92,22 +92,23 @@ TVector<T>::TVector(TVector&& other) {
 
 template<typename T>
 TVector<T>& TVector<T>::operator =(TVector&& other) {
-    this->dataPtr = other.dataPtr;
-    this->size = other.size;
-    this->capacity = other.capacity;
-
-    other.dataPtr = new T[INIT_CAPACITY];
-    other.size = 0;
-    other.capacity = INIT_CAPACITY;
-
+    if (this != &other) {
+        delete[] this->dataPtr;
+        
+        this->dataPtr = other.dataPtr;
+        this->size = other.size;
+        this->capacity = other.capacity;
+    
+        other.dataPtr = new T[INIT_CAPACITY];
+        other.size = 0;
+        other.capacity = INIT_CAPACITY;
+    }
     return *this;
 }
 
 template<typename T>
 TVector<T>::~TVector() {
-    if (this->dataPtr != nullptr) {
-        delete[] this->dataPtr;
-    }
+    delete[] this->dataPtr;
 }
 
 template<typename T>
