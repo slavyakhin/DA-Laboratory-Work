@@ -1,0 +1,18 @@
+\section{Тест производительности}
+
+Тест производительности представляет из себя следующее: поразрядная сортировка сравнивается с $std::stable\_sort()$, чья сложность, согласно стандарту C++17, $O(n*\log(n))/O(n*(\log(n))^{2})$ (В GCC реализация --- merge sort).
+Тестовый набор данных содержит в себе 1000000 ($10^{6}$) строк --- пар ключ-значение.
+
+\begin{alltt}
+root@77eb62ed9309:/workspaces/DA-Laboratory-Work/Lab_n1/solution# g++ -std=c++17 -Wall -Wextra -I. -o radix main.cpp       
+root@77eb62ed9309:/workspaces/DA-Laboratory-Work/Lab_n1/solution# ./radix
+RadixSort time: 1.12129
+root@77eb62ed9309:/workspaces/DA-Laboratory-Work/Lab_n1/solution# g++ -std=c++17 -Wall -Wextra -I. -o std_sort std_sort.cpp 
+root@77eb62ed9309:/workspaces/DA-Laboratory-Work/Lab_n1/solution# ./std_sort 
+std::stable_sort time: 2.21333
+\end{alltt}
+
+Как видим, поразрядная сортировка оказалась значительно боллее эффективным методом для такого набора данных.
+
+\pagebreak
+

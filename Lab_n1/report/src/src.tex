@@ -1,0 +1,216 @@
+\section{Описание}
+Требуется написать реализацию алгоритма поразрядной сортировки.
+
+Поразрядная сортировка используется для наборов данных, в которых ключ можно поделить на "разряды" такие как,
+например, цифры в десятичном числе или небольшие группы бит в двоичном числе.
+Если такие разряды могут обладают достаточно небольшим набором значений, то для каждого из них удобно использовать сортировку подсчетом.
+Таким образом, применив сортировку подсчетом для каждого разряда можно отсортировать набор данных.
+
+Тогда временная сложность алгоритма будет $O(n\omega)$, где
+
+n --- количество сортируемых элементов
+
+$\omega$ --- количество разрядов в одном ключе
+
+\pagebreak
+
+\section{Исходный код}
+Программа состоит из нескольких файлов.
+
+На каждой непустой строке входного файла располагается пара \enquote{ключ-значение}, поэтому создадим новую 
+структуру $TKeyValuePair$, в которой будем хранить ключ и значение.
+Для хранения ключа тоже создадим структуру $TDate$ в которой реализуем поразрядное представление даты.
+Также напишем свою реализацию динамического массива $TVector$ для хранения данных.
+
+\begin{longtable}{|p{7.5cm}|p{7.5cm}|}
+\hline
+\rowcolor{lightgray}
+\multicolumn{2}{|c|} {main.cpp}\\
+\hline
+int main()&Точка входа в программу. Объявление контейнера, ввод данных, вызов сортировки, вывод отсортированного массива\\
+\hline
+\rowcolor{lightgray}
+\multicolumn{2}{|c|} {sort.hpp}\\
+\hline
+void RadixSort(TVector< TKeyValuePair<TDate, unsigned long long> >\& vector)&Поразрядная сортировка.\\
+\hline
+\rowcolor{lightgray}
+\multicolumn{2}{|c|} {vector.hpp}\\
+\hline
+class TVector&Динамический массив\\
+\hline
+\rowcolor{lightgray}
+\multicolumn{2}{|c|} {pair.hpp}\\
+\hline
+struct TKeyValuePair&Пара ключ-значение\\
+\hline
+\rowcolor{lightgray}
+\multicolumn{2}{|c|} {date.hpp}\\
+\hline
+class TDate&Дата с поразрадным представлением\\
+\hline
+\end{longtable}
+
+$main.cpp$
+\begin{lstlisting}[language=c++]
+#include <iostream>
+#include <fstream>
+#include <string>
+	
+#include "pair.hpp"
+#include "date.hpp"
+#include "vector.hpp"
+#include "sort.hpp"
+	
+	
+int main()
+{
+	unsigned long long value;
+
+	std::string strBuf;
+	
+	TKeyValuePair<TDate, unsigned long long> pairBuf;    
+
+	TVector< TKeyValuePair<TDate, unsigned long long> > vector;
+
+	std::ifstream fin("input.txt");
+	std::ofstream fout("output.txt");
+
+	while (fin >> strBuf >> value) {
+		TDate dateBuf(strBuf);
+		pairBuf.key = dateBuf;
+		pairBuf.value = value;
+		
+		vector.PushBack(pairBuf);
+	}
+	
+	RadixSort(vector);
+
+	for (int i = 0; i < vector.Size(); ++i) {
+		fout << vector[i].key.GetDateStr() << '\t' << vector[i].value << '\n';
+	}
+	
+	fin.close();
+	fout.close();
+	
+	return 0;
+}
+\end{lstlisting}
+
+$sort.hpp$
+\begin{lstlisting}[language=c++]
+#pragma once
+const int COUNT_SIZE = 10;
+
+void RadixSort(TVector< TKeyValuePair<TDate, unsigned long long> >& vector) {
+	int prefSumCountArray[COUNT_SIZE];  // index for next element with this digit at the place
+	TVector< TKeyValuePair<TDate, unsigned long long> > tmpVector(vector.Size());
+
+	// key[] = {y, y, y, y, m, m, d, d}
+	for (int digitOffset = DATE_SIZE - 1; digitOffset >= 0; --digitOffset) {
+
+		for (int i = 0; i < COUNT_SIZE; ++i) {      // init auxiliary arrays with zeros
+			prefSumCountArray[i] = 0;
+		}
+		for (int i = 0; i < vector.Size(); ++i) {   // Counting keys with same digit
+			++prefSumCountArray[vector[i].key[digitOffset] - '0'];
+		}
+		for (int i = 1; i < COUNT_SIZE; ++i) {      // Prefix sum for index of beginning of a series of same keys
+			prefSumCountArray[i] += prefSumCountArray[i - 1];
+		}
+		for (int i = vector.Size() - 1; i >= 0; --i) {   // Forming result
+			tmpVector[prefSumCountArray[vector[i].key[digitOffset] - '0'] - 1] = vector[i];
+			--prefSumCountArray[vector[i].key[digitOffset] - '0'];
+		}
+		for (int i = 0; i < vector.Size(); ++i) {   // Result
+			vector[i] = tmpVector[i];
+		}
+	}
+}
+\end{lstlisting}
+
+$vector.hpp$
+\begin{lstlisting}[language=c++]
+template<typename T>
+class TVector
+{
+private:
+	int size;
+	int capacity; // max_length before reallocate
+	T* dataPtr;
+
+public:
+	// Constructors
+	TVector();
+	TVector(const int size);
+	TVector(const int size, T initValue);
+
+	TVector(const TVector& other);
+	TVector& operator =(const TVector& other);
+
+	TVector(TVector&& other);
+	TVector& operator =(TVector&& other);
+
+	// Destructor
+	~TVector();
+
+	// 
+	int Size(); // Returns length
+	bool Empty(); // length == 0
+	T& operator [](const int index);
+	void PushBack(const T& element); // Returns 0 in case of failure
+	T PopBack(); // Removes last element and returns it
+
+};
+\end{lstlisting}
+
+$pair.hpp$
+\begin{lstlisting}[language=c++]
+template<typename TKey, typename TValue>
+struct TKeyValuePair
+{
+	TKey key;
+	TValue value;
+
+	TKeyValuePair() = default;
+
+	bool operator <(const TKeyValuePair& other) const;
+};
+\end{lstlisting}
+
+$date.hpp$
+\begin{lstlisting}[language=c++]
+class TDate
+{
+private:
+	std::string strDate;
+	char digits[DATE_SIZE];
+public:
+	TDate() = default;
+	TDate(const std::string& str);
+	char operator [](int index);
+	bool operator <(TDate& other);
+
+	std::string GetDateStr() const;
+};
+\end{lstlisting}
+
+\pagebreak
+
+\section{Консоль}
+\begin{alltt}
+root@77eb62ed9309:/workspaces/DA-Laboratory-Work/Lab_n1/solution# g++ -std=c++17 -Wall -Wextra -I. -o solution main.cpp
+root@77eb62ed9309:/workspaces/DA-Laboratory-Work/Lab_n1/solution# cat input.txt
+1.1.1   13207862122685464576
+01.02.2008      7670388314707853312
+1.1.1   4588010303972900864
+01.02.2008      12992997081104908288
+root@77eb62ed9309:/workspaces/DA-Laboratory-Work/Lab_n1/solution# ./solution 
+root@77eb62ed9309:/workspaces/DA-Laboratory-Work/Lab_n1/solution# cat output.txt 
+1.1.1   13207862122685464576
+1.1.1   4588010303972900864
+01.02.2008      7670388314707853312
+01.02.2008      12992997081104908288
+\end{alltt}
+\pagebreak
+

@@ -12,7 +12,8 @@ private:
 public:
     TDate() = default;
     TDate(const std::string& str);
-    char operator [](int index);
+    char operator [](int index) const;
+    bool operator <(const TDate& other) const;
 
     std::string GetDateStr() const;
 };
@@ -47,12 +48,24 @@ TDate::TDate(const std::string& str) {
     }
 }
 
-char TDate::operator [](int index) {
+char TDate::operator [](int index) const {
     return this->digits[index];
 }
 
 std::string TDate::GetDateStr() const {
     return this->strDate;
+}
+
+bool TDate::operator<(const TDate& other) const {
+    for (int i = 0; i < DATE_SIZE; ++i) {
+        if (this->digits[i] < other[i]) {
+            return true;
+        }
+        if (this->digits[i] > other[i]) {
+            break;
+        }
+    }
+    return false;
 }
 
 std::ostream& operator <<(std::ostream& os, const TDate& date) {

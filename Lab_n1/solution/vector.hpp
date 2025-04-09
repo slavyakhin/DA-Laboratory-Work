@@ -25,13 +25,59 @@ public:
     // Destructor
     ~TVector();
 
-    // 
+    // RandomAccessIterator for std::stable_sort
+    struct Iterator {
+        using iterator_category = std::random_access_iterator_tag;
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = value_type*;
+        using reference = value_type&;
+
+
+        Iterator(pointer ptr) : m_ptr(ptr) {}
+
+        reference operator* () const { return *m_ptr; }
+        pointer operator-> () { return m_ptr; }
+
+        Iterator& operator++ () { m_ptr++; return *this; }
+        Iterator operator++ (int) { Iterator tmp = *this; ++(*this); return tmp; }
+
+        Iterator& operator-- () { m_ptr--; return *this; }
+        Iterator operator-- (int) { Iterator tmp = *this; --(*this); return tmp; }
+
+        friend bool operator== (const Iterator& a, const Iterator& b) { return a.m_ptr == b.m_ptr; };
+        friend bool operator!= (const Iterator& a, const Iterator& b) { return a.m_ptr != b.m_ptr; };
+
+        friend bool operator< (const Iterator& a, const Iterator& b) { return a.m_ptr < b.m_ptr; };
+        friend bool operator> (const Iterator& a, const Iterator& b) { return a.m_ptr > b.m_ptr; };
+        friend bool operator<= (const Iterator& a, const Iterator& b) { return a.m_ptr <= b.m_ptr; };
+        friend bool operator>= (const Iterator& a, const Iterator& b) { return a.m_ptr >= b.m_ptr; };
+
+        Iterator operator+ (const int n) const { Iterator result(m_ptr + n); return result; }
+        Iterator& operator+= (const int n) { this->m_ptr += n; return *this; }
+        Iterator operator- (const int n) const { Iterator result(m_ptr - n); return result; }
+        Iterator& operator-= (const int n) { this->m_ptr -= n; return *this; }
+
+        difference_type operator- (const Iterator& other) const { return m_ptr - other.m_ptr; }
+
+        Iterator& operator[](difference_type n) const {Iterator result(m_ptr + n); return result; }
+
+    private:
+        pointer m_ptr;
+    };
+
+    Iterator begin() {
+        return Iterator(&dataPtr[0]);
+    }
+    Iterator end() {
+        return Iterator(&dataPtr[this->size]);
+    }
+
     int Size(); // Returns length
     bool Empty(); // length == 0
     T& operator [](const int index);
     void PushBack(const T& element); // Returns 0 in case of failure
     T PopBack(); // Removes last element and returns it
-
 };
 
 template<typename T>

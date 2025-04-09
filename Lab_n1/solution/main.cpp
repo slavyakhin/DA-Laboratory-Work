@@ -7,13 +7,10 @@
 #include "vector.hpp"
 #include "sort.hpp"
 
+#include <time.h>
 
 int main()
 {
-    std::ios_base::sync_with_stdio(false);
-    std::cout.tie(0);
-    std::cin.tie(0);
-
     unsigned long long value;
 
     std::string strBuf;
@@ -32,8 +29,14 @@ int main()
         
         vector.PushBack(pairBuf);
     }
+
+    clock_t startTime, endTime;
+    startTime = clock();
     
     RadixSort(vector);
+
+    endTime = clock();
+    std::cout << "RadixSort time: " << (double)(endTime - startTime)/CLOCKS_PER_SEC << '\n';
 
     for (int i = 0; i < vector.Size(); ++i) {
         fout << vector[i].key.GetDateStr() << '\t' << vector[i].value << '\n';

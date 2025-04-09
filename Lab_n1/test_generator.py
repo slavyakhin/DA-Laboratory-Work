@@ -8,7 +8,7 @@ def get_random_ulint():
     return str(random.randint(0, 2 ** 64 - 1))
 
 def main():
-    input_list = [(get_random_date(), get_random_ulint()) for i in range(100)]
+    input_list = [(get_random_date(), get_random_ulint()) for i in range(1000000)]
 
     fTestInput = open("input.txt", 'w')
     for KeyValuePair in input_list:
